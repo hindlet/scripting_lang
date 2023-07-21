@@ -5,13 +5,13 @@ use super::*;
 
 pub fn file_to_script(
     path: &str
-) -> Script {
+) -> ScriptBuilder {
     text_to_script(&fs::read_to_string(path).unwrap())
 }
 
 pub fn text_to_script(
     text: &str,
-) -> Script {
+) -> ScriptBuilder {
     let (buildings_text, items_text, run_text) = break_into_sections(text);
 
     let building_bindings: BTreeMap<&str, u32> = process_data_section(&buildings_text);
@@ -29,9 +29,23 @@ pub fn text_to_script(
         commands
     };
 
-    Script {
-        building_bindings: BTreeMap::new(),
-        item_bindings: BTreeMap::new(),
+    let final_bindings = {
+        let mut new_building_binds = BTreeMap::new();
+        for bind in building_bindings {
+            new_building_binds.insert(bind.0.to_string(), bind.1);
+        }
+
+        let mut new_item_binds = BTreeMap::new();
+        for bind in item_bindings {
+            new_item_binds.insert(bind.0.to_string(), bind.1);
+        }
+
+        (new_building_binds, new_item_binds)
+    };
+
+    ScriptBuilder {
+        building_bindings: final_bindings.0,
+        item_bindings: final_bindings.1,
         commands: commands
     }
 }

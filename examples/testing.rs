@@ -16,10 +16,12 @@ fn main() {
         },
     ]);
 
-    let mut script = file_to_script("assets/script.gobbledygook");
-    
-    script.bind_buildings(vec![0, 1]);
-    script.bind_items(vec![0, 1]);
+    let builder = file_to_script("assets/script.gobbledygook");
+
+    let script = builder.bind_and_build(
+        vec![("mine", 0), ("factory", 1)],
+        vec![("raw", 0), ("processed", 1)]
+    );
 
     let mut player = Player::new([0, 5]);
 
